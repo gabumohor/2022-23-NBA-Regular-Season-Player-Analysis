@@ -1,0 +1,133 @@
+---
+title: "EFF"
+output: html_document
+date: "2023-06-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+
+# Data
+PLAYER <- c(
+  "Nikola Jokic", "Joel Embiid", "Luka Doncic", "Giannis Antetokounmpo", "Domantas Sabonis",
+  "Shai Gilgeous-Alexander", "Damian Lillard", "Jayson Tatum", "James Harden", "Jimmy Butler",
+  "Kyrie Irving", "Lauri Markkanen", "Pascal Siakam", "Kristaps Porzingis", "Julius Randle",
+  "Ja Morant", "Donovan Mitchell", "Trae Young", "Nikola Vucevic", "Bam Adebayo"
+)
+EFF <- c(
+  38.8, 33.1, 32.1, 30.9, 27.7, 27.4, 27.3, 27.2, 27.0, 26.6, 26.6, 26.4, 25.9, 25.5,
+  25.2, 25.2, 24.8, 24.7, 24.4, 24.4
+)
+
+# Create a data frame
+eff_df <- data.frame(PLAYER, EFF)
+
+# Sort the data frame by EFF in descending order
+eff_df <- eff_df[order(-eff_df$EFF), ]
+
+data <- data.frame(
+  PLAYER = c("Nikola Jokic", "Joel Embiid", "Luka Doncic", "Giannis Antetokounmpo", "Domantas Sabonis", "Shai Gilgeous-Alexander", "Damian Lillard", "Jayson Tatum", "James Harden", "Jimmy Butler", "Kyrie Irving", "Lauri Markkanen", "Pascal Siakam", "Kristaps Porzingis", "Julius Randle", "Ja Morant", "Donovan Mitchell", "Trae Young", "Nikola Vucevic", "Bam Adebayo"),
+  TEAM = c("DEN", "PHI", "DAL", "MIL", "SAC", "OKC", "POR", "BOS", "PHI", "MIA", "DAL", "UTA", "TOR", "WAS", "NYK", "MEM", "CLE", "ATL", "CHI", "MIA"),
+  GP = c(69, 66, 66, 63, 79, 68, 58, 74, 58, 64, 60, 66, 71, 65, 77, 61, 68, 73, 82, 75),
+  MIN = c(33.7, 34.6, 36.2, 32.1, 34.6, 35.5, 36.3, 36.9, 36.8, 33.4, 37.4, 34.4, 37.4, 32.6, 35.5, 31.9, 35.8, 34.8, 33.5, 34.6),
+  PTS = c(24.5, 33.1, 32.4, 31.1, 19.1, 31.4, 32.2, 30.1, 21.0, 22.9, 27.1, 25.6, 24.2, 23.2, 25.1, 26.2, 28.3, 26.2, 17.6, 20.4),
+  FGM = c(9.4, 11.0, 10.9, 11.2, 7.3, 10.4, 9.6, 9.8, 6.4, 7.5, 9.9, 8.7, 8.9, 7.8, 8.5, 9.3, 10.0, 8.2, 7.3, 8.0),
+  FGA = c(14.8, 20.1, 22.0, 20.3, 11.9, 20.3, 20.7, 21.1, 14.5, 13.9, 20.1, 17.3, 18.5, 15.7, 18.6, 19.9, 20.6, 19.0, 14.0, 14.9),
+  `FG%` = c(63.2, 54.8, 49.6, 55.3, 61.5, 51.0, 46.3, 46.6, 44.1, 53.9, 49.4, 49.9, 48.0, 49.8, 45.9, 46.6, 48.4, 42.9, 52.0, 54.0),
+  `3PM` = c(0.8, 1.0, 2.8, 0.7, 0.4, 0.9, 4.2, 3.2, 2.8, 0.6, 3.1, 3.0, 1.3, 2.1, 2.8, 1.5, 3.6, 2.1, 1.5, 0.0),
+  `3PA` = c(2.2, 3.0, 8.2, 2.7, 1.1, 2.5, 11.3, 9.3, 7.2, 1.6, 8.3, 7.7, 4.0, 5.5, 8.3, 4.9, 9.3, 6.3, 4.2, 0.2),
+  `3P%` = c(38.3, 33.0, 34.2, 27.5, 37.3, 34.5, 37.1, 35.0, 38.5, 35.0, 37.9, 39.1, 32.4, 38.5, 34.3, 30.7, 38.6, 33.5, 34.9, 8.3),
+  FTM = c(4.9, 10.0, 7.8, 7.9, 4.1, 9.8, 8.8, 7.2, 5.4, 7.4, 4.1, 5.3, 5.2, 5.4, 5.2, 6.1, 4.7, 7.8, 1.6, 4.3),
+  FTA = c(6.0, 11.7, 10.5, 12.3, 5.5, 10.9, 9.6, 8.4, 6.2, 8.7, 4.6, 6.0, 6.7, 6.4, 6.9, 8.1, 5.4, 8.8, 1.9, 5.4),
+  `FT%` = c(82.2, 85.7, 74.2, 64.5, 74.2, 90.5, 91.4, 85.4, 86.7, 85.0, 90.5, 87.5, 77.4, 85.1, 75.7, 74.8, 86.7, 88.6, 83.5, 80.6),
+  OREB = c(2.4, 1.7, 0.8, 2.2, 3.2, 0.9, 0.8, 1.1, 0.7, 2.2, 1.0, 2.0, 1.8, 1.8, 1.0, 0.9, 0.9, 0.8, 1.9, 2.5),
+  DREB = c(9.4, 8.4, 7.8, 9.6, 9.1, 4.0, 4.0, 7.7, 5.4, 3.7, 4.1, 6.7, 6.0, 6.6, 8.1, 4.9, 3.3, 2.2, 9.1, 6.7),
+  REB = c(11.8, 10.2, 8.6, 11.8, 12.3, 4.8, 4.8, 8.8, 6.1, 5.9, 5.1, 8.6, 7.8, 8.4, 10.0, 5.9, 4.3, 3.0, 11.0, 9.2),
+  AST = c(9.8, 4.2, 8.0, 5.7, 7.3, 5.5, 7.3, 4.6, 10.7, 5.3, 5.5, 1.9, 5.8, 2.7, 4.1, 8.1, 4.4, 10.2, 3.2, 3.2),
+  STL = c(1.3, 1.0, 1.4, 0.8, 0.8, 1.6, 0.9, 1.1, 1.2, 1.8, 1.1, 0.6, 0.9, 0.9, 0.6, 1.1, 1.5, 1.1, 0.6, 1.2),
+  BLK = c(0.7, 1.7, 0.5, 0.8, 0.5, 1.0, 0.3, 0.7, 0.5, 0.3, 0.8, 0.6, 0.5, 1.5, 0.3, 0.3, 0.4, 0.1, 0.7, 0.8),
+  TOV = c(3.6, 3.4, 3.6, 3.9, 2.9, 2.8, 3.3, 2.9, 3.4, 1.6, 2.1, 1.9, 2.4, 2.1, 2.8, 3.4, 2.6, 4.1, 1.7, 2.5),
+  EFF = c(38.0, 35.9, 33.5, 32.9, 31.1, 30.5, 30.2, 29.9, 27.2, 27.0, 26.8, 26.0, 25.8, 25.7, 25.6, 25.4, 24.8, 24.6, 23.5, 23.4)
+)
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+
+```
+
+
+```{r pressure, echo=FALSE}
+library(ggplot2)
+
+# Data
+eff_df <- data.frame(
+  PLAYER = c("Nikola Jokic", "Joel Embiid", "Luka Doncic", "Giannis Antetokounmpo", "Domantas Sabonis", "Shai Gilgeous-Alexander", "Damian Lillard", "Jayson Tatum", "James Harden", "Jimmy Butler", "Kyrie Irving", "Lauri Markkanen", "Pascal Siakam", "Kristaps Porzingis", "Julius Randle", "Ja Morant", "Donovan Mitchell", "Trae Young", "Nikola Vucevic", "Bam Adebayo"),
+  EFF = c(38.8, 33.1, 32.1, 30.9, 27.7, 27.4, 27.3, 27.2, 27.0, 26.6, 26.6, 26.4, 25.9, 25.5, 25.2, 25.2, 24.8, 24.7, 24.4, 24.4)
+)
+
+# Sort the data frame by EFF in descending order
+eff_df <- eff_df[order(-eff_df$EFF), ]
+
+# Set the color palette
+colors <- c("#FFA07A", "#FFC0CB", "#FFE4E1", "#FFDAB9", "#FFDEAD",
+            "#FFA500", "#FFD700", "#FFFACD", "#F0E68C", "#DAA520",
+            "#BDB76B", "#7FFF00", "#ADFF2F", "#00FF00", "#00FA9A",
+            "#98FB98", "#00CED1", "#00BFFF", "#1E90FF", "#6495ED")
+
+library(ggplot2)
+# Add values at the top of each bar
+ggplot(eff_df, aes(x = reorder(PLAYER, EFF), y = EFF, fill = PLAYER)) +
+  geom_bar(stat = "identity", width = 0.7)  +
+  geom_text(aes(label = EFF), vjust = -0.5, size = 3) +
+  scale_fill_manual(values = colors) +
+  labs(title = "2022-23 NBA Regular Season Player EFF", x = "Player", y = "EFF Rating") +
+  theme_bw() +
+  theme(plot.title = element_text(face = "bold", size = 12),
+        axis.title = element_text(face = "bold", size = 10),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 10),
+        legend.position = "right",
+        legend.key.size = unit(0.5, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 8))
+
+
+# Define the color palette
+colors <- c("#FFA07A", "#FFC0CB", "#FFE4E1", "#FFDAB9", "#FFDEAD",
+            "#FFA500", "#FFD700", "#FFFACD", "#F0E68C", "#DAA520",
+            "#BDB76B", "#7FFF00", "#ADFF2F", "#00FF00", "#00FA9A",
+            "#98FB98", "#00CED1", "#00BFFF", "#1E90FF", "#6495ED")
+
+# Create the bar chart with PTS as PPG
+bar_chart <- ggplot(data, aes(x = reorder(PLAYER, -PTS), y = PTS, fill = PLAYER)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Points Per Game (PPG) by Player", x = "Player", y = "PTS") +
+  scale_fill_manual(values = colors, guide = guide_legend(override.aes = list(size = 2))) +
+  theme_minimal() +
+  theme(legend.position = "right",
+        legend.key.size = unit(0.5, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 8),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
+        plot.subtitle = element_text(face = "bold", size = 10),
+        plot.caption = element_text(face = "bold", size = 8),
+        plot.background = element_rect(color = "black", fill = NA, size = 1))
+
+# Display the bar chart
+bar_chart
+
+
+
+
+
+```
+It's important to note that EFF is not a perfect metric and has limitations. It does not capture certain aspects of the game, such as a player's defensive impact, intangibles like leadership, or the quality of opposition faced. Therefore, while EFF can provide valuable insights into a player's performance, it should be considered alongside other metrics and qualitative observations to form a comprehensive assessment.
